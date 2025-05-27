@@ -30,6 +30,8 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
   const [numSources, setNumSources] = useState(DEFAULT_NUM_SOURCES)
   const [animationSpeed, setAnimationSpeed] = useState(DEFAULT_ANIMATION_SPEED)
 
+  const [controlsCollapsed, setControlsCollapsed] = useState(false)
+
   const handleReset = () => {
     setFrequency(DEFAULT_FREQUENCY)
     setAmplitude(DEFAULT_AMPLITUDE)
@@ -68,6 +70,20 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       ctx && ctx.clearRect(0, 0, canvas.width, canvas.height)
     }
   }, [wandMode, sparklePos])
+
+  // Responsive effect: collapse controls by default on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      if (window.innerWidth < 700) {
+        setControlsCollapsed(true)
+      } else {
+        setControlsCollapsed(false)
+      }
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -418,25 +434,39 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         gap: '24px',
         alignItems: 'center',
         flexWrap: 'wrap',
+        position: 'relative',
       }}>
-        <button onClick={() => setWandMode(w => !w)} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: wandMode ? '#ffe6fa' : '#f7f7f7', cursor: 'pointer', color: wandMode ? '#c800a1' : undefined }}>
-          {wandMode ? '🪄 Magic Wand On' : '🪄 Magic Wand Off'}
+        <button
+          onClick={() => setControlsCollapsed(c => !c)}
+          style={{
+            display: 'inline-block',
+            position: 'absolute', left: 8, top: 8, zIndex: 3,
+            background: '#f7f7f7', border: '1px solid #ccc', borderRadius: 4, padding: '4px 10px', fontWeight: 600, cursor: 'pointer',
+            fontSize: 18,
+          }}
+        >
+          {controlsCollapsed ? '☰ Show Controls' : '× Hide Controls'}
         </button>
-        <button onClick={handleReset} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: '#f7f7f7', cursor: 'pointer' }}>
-          Reset to Defaults
-        </button>
-        <label>
-          Frequency: <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} /> {frequency.toFixed(2)}
-        </label>
-        <label>
-          Amplitude: <input type="range" min={0.1} max={1} step={0.01} value={amplitude} onChange={e => setAmplitude(Number(e.target.value))} /> {amplitude.toFixed(2)}
-        </label>
-        <label>
-          Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
-        </label>
-        <label>
-          Animation Speed: <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
-        </label>
+        <div style={{ display: controlsCollapsed ? 'none' : 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: 'center' }}>
+          <button onClick={() => setWandMode(w => !w)} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: wandMode ? '#ffe6fa' : '#f7f7f7', cursor: 'pointer', color: wandMode ? '#c800a1' : undefined }}>
+            {wandMode ? '🪄 Magic Wand On' : '🪄 Magic Wand Off'}
+          </button>
+          <button onClick={handleReset} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: '#f7f7f7', cursor: 'pointer' }}>
+            Reset to Defaults
+          </button>
+          <label>
+            Frequency: <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} /> {frequency.toFixed(2)}
+          </label>
+          <label>
+            Amplitude: <input type="range" min={0.1} max={1} step={0.01} value={amplitude} onChange={e => setAmplitude(Number(e.target.value))} /> {amplitude.toFixed(2)}
+          </label>
+          <label>
+            Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
+          </label>
+          <label>
+            Animation Speed: <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
+          </label>
+        </div>
       </div>
       <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%', position: 'relative', cursor: wandMode ? 'url("data:image/svg+xml,%3Csvg width=\'32\' height=\'32\' viewBox=\'0 0 32 32\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect x=\'13\' y=\'2\' width=\'6\' height=\'20\' rx=\'3\' fill=\'%23c800a1\'/%3E%3Ccircle cx=\'16\' cy=\'4\' r=\'4\' fill=\'%23ffb3f6\'/%3E%3C/svg%3E%22) 0 32, auto' : undefined }}>
         {/* Sparkle overlay canvas */}
