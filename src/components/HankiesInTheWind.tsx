@@ -17,6 +17,11 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
   const [currentZoom] = useState(initialZoom)
   const [mouseSource, setMouseSource] = useState<WaveSourceProps | null>(null)
 
+  // UI controls state
+  const [frequency, setFrequency] = useState(2.5)
+  const [amplitude, setAmplitude] = useState(0.4)
+  const [numSources, setNumSources] = useState(5)
+
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -29,7 +34,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
 
     const createWaveSources = (time: number, scale: number): WaveSourceProps[] => {
       const result: WaveSourceProps[] = []
-      const count = 5
+      const count = numSources
       
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2
@@ -41,16 +46,16 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
             0,
             Math.sin(angle) * radius
           ],
-          frequency: 2 + Math.sin(angle * 2),
-          amplitude: 0.3 + Math.cos(angle) * 0.1,
+          frequency: frequency + Math.sin(angle * 2),
+          amplitude: amplitude + Math.cos(angle) * 0.1,
           phase: time * 3 + angle
         })
       }
       
       result.push({
         position: [0, 0, 0],
-        frequency: 3,
-        amplitude: 0.4,
+        frequency: frequency + 1,
+        amplitude: amplitude + 0.1,
         phase: time * 4
       })
       
@@ -342,9 +347,33 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       container.removeEventListener('touchmove', handleTouchMove)
       container.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [currentZoom, mouseSource])
+  }, [currentZoom, mouseSource, frequency, amplitude, numSources])
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{
+        background: '#fff',
+        padding: '12px 16px',
+        borderBottom: '1px solid #eee',
+        zIndex: 2,
+        display: 'flex',
+        gap: '24px',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+      }}>
+        <label>
+          Frequency: <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} /> {frequency.toFixed(2)}
+        </label>
+        <label>
+          Amplitude: <input type="range" min={0.1} max={1} step={0.01} value={amplitude} onChange={e => setAmplitude(Number(e.target.value))} /> {amplitude.toFixed(2)}
+        </label>
+        <label>
+          Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
+        </label>
+      </div>
+      <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%' }} />
+    </div>
+  )
 }
 
 export default HankiesInTheWind 
