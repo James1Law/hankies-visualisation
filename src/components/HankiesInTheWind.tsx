@@ -431,40 +431,52 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         borderBottom: '1px solid #eee',
         zIndex: 2,
         display: 'flex',
-        gap: '24px',
+        flexDirection: 'column',
+        gap: '12px',
         alignItems: 'center',
         flexWrap: 'wrap',
         position: 'relative',
       }}>
-        <button
-          onClick={() => setControlsCollapsed(c => !c)}
-          style={{
-            display: 'inline-block',
-            position: 'absolute', left: 8, top: 8, zIndex: 3,
-            background: '#f7f7f7', border: '1px solid #ccc', borderRadius: 4, padding: '4px 10px', fontWeight: 600, cursor: 'pointer',
-            fontSize: 18,
-          }}
-        >
-          {controlsCollapsed ? '☰ Show Controls' : '× Hide Controls'}
-        </button>
-        <div style={{ display: controlsCollapsed ? 'none' : 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: 'center' }}>
+        {/* Collapse/Expand button row */}
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+          <button
+            onClick={() => setControlsCollapsed(c => !c)}
+            style={{
+              background: '#f7f7f7', border: '1px solid #ccc', borderRadius: 4, padding: '4px 14px', fontWeight: 600, cursor: 'pointer',
+              fontSize: 18,
+              minWidth: 140,
+            }}
+          >
+            {controlsCollapsed ? '☰ Show Controls' : '× Hide Controls'}
+          </button>
+        </div>
+        {/* Controls row (collapsible) */}
+        <div style={{ display: controlsCollapsed ? 'none' : 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', width: '100%', justifyContent: 'center', flexDirection: 'row' }}>
           <button onClick={() => setWandMode(w => !w)} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: wandMode ? '#ffe6fa' : '#f7f7f7', cursor: 'pointer', color: wandMode ? '#c800a1' : undefined }}>
             {wandMode ? '🪄 Magic Wand On' : '🪄 Magic Wand Off'}
           </button>
           <button onClick={handleReset} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: '#f7f7f7', cursor: 'pointer' }}>
             Reset to Defaults
           </button>
-          <label>
-            Frequency: <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} /> {frequency.toFixed(2)}
+          <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 120 }}>
+            Frequency:
+            <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} />
+            <span>{frequency.toFixed(2)}</span>
           </label>
-          <label>
-            Amplitude: <input type="range" min={0.1} max={1} step={0.01} value={amplitude} onChange={e => setAmplitude(Number(e.target.value))} /> {amplitude.toFixed(2)}
+          <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 120 }}>
+            Amplitude:
+            <input type="range" min={0.1} max={1} step={0.01} value={amplitude} onChange={e => setAmplitude(Number(e.target.value))} />
+            <span>{amplitude.toFixed(2)}</span>
           </label>
-          <label>
-            Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
+          <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 120 }}>
+            Sources:
+            <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} />
+            <span>{numSources}</span>
           </label>
-          <label>
-            Animation Speed: <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
+          <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 120 }}>
+            Animation Speed:
+            <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} />
+            <span>{animationSpeed.toFixed(4)}</span>
           </label>
         </div>
       </div>
