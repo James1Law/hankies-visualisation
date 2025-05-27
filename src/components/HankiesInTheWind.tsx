@@ -386,7 +386,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
           Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
         </label>
         <label>
-          Animation Speed: <input type="range" min={0.0001} max={0.003} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
+          Animation Speed: <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
         </label>
       </div>
       <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%' }} />
