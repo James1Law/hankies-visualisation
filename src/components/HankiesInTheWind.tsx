@@ -1,12 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 
-const metadata = {
-  themes: "Interference, Pattern, Wave, Interaction, Harmony",
-  visualization: "Precise geometric interference patterns with wave interactions",
-  promptSuggestion: "1. Enhance interference complexity\n2. Add more wave interactions\n3. Develop stronger patterns\n4. Create clearer harmonies\n5. Increase sense of interaction"
-}
-
 interface WaveSourceProps {
   position: [number, number, number]
   frequency: number
@@ -20,7 +14,7 @@ interface HankiesInTheWindProps {
 
 const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [currentZoom, setCurrentZoom] = useState(initialZoom)
+  const [currentZoom] = useState(initialZoom)
   const [mouseSource, setMouseSource] = useState<WaveSourceProps | null>(null)
 
   useEffect(() => {
@@ -79,7 +73,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
           const z = (j * step) - (size / 2)
           let height = 0
           
-          sources.forEach(({ position: [sx, sy, sz], frequency, amplitude, phase }, idx) => {
+          sources.forEach(({ position: [sx, , sz], frequency, amplitude, phase }) => {
             const dx = x - sx
             const dz = z - sz
             const distance = Math.sqrt(dx * dx + dz * dz)
