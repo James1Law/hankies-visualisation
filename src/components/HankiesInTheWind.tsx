@@ -287,8 +287,8 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       const posZ = y * (size / 2)
       setMouseSource({
         position: [posX, 0, posZ],
-        frequency: 3.5,
-        amplitude: 0.5,
+        frequency: frequency + 1,
+        amplitude: amplitude + 0.1,
         phase: 0
       })
     }
@@ -309,8 +309,8 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       const posZ = y * (size / 2)
       setMouseSource({
         position: [posX, 0, posZ],
-        frequency: 3.5,
-        amplitude: 0.5,
+        frequency: frequency + 1,
+        amplitude: amplitude + 0.1,
         phase: 0
       })
     }
@@ -327,8 +327,8 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       const posZ = y * (size / 2)
       setMouseSource({
         position: [posX, 0, posZ],
-        frequency: 3.5,
-        amplitude: 0.5,
+        frequency: frequency + 1,
+        amplitude: amplitude + 0.1,
         phase: 0
       })
     }
