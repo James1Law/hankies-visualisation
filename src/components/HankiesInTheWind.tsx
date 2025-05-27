@@ -18,9 +18,18 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
   const [mouseSource, setMouseSource] = useState<WaveSourceProps | null>(null)
 
   // UI controls state
-  const [frequency, setFrequency] = useState(2.5)
-  const [amplitude, setAmplitude] = useState(0.4)
-  const [numSources, setNumSources] = useState(5)
+  const DEFAULT_FREQUENCY = 2.5;
+  const DEFAULT_AMPLITUDE = 0.4;
+  const DEFAULT_NUM_SOURCES = 5;
+  const [frequency, setFrequency] = useState(DEFAULT_FREQUENCY)
+  const [amplitude, setAmplitude] = useState(DEFAULT_AMPLITUDE)
+  const [numSources, setNumSources] = useState(DEFAULT_NUM_SOURCES)
+
+  const handleReset = () => {
+    setFrequency(DEFAULT_FREQUENCY)
+    setAmplitude(DEFAULT_AMPLITUDE)
+    setNumSources(DEFAULT_NUM_SOURCES)
+  }
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -361,6 +370,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         alignItems: 'center',
         flexWrap: 'wrap',
       }}>
+        <button onClick={handleReset} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: '#f7f7f7', cursor: 'pointer' }}>
+          Reset to Defaults
+        </button>
         <label>
           Frequency: <input type="range" min={1} max={6} step={0.01} value={frequency} onChange={e => setFrequency(Number(e.target.value))} /> {frequency.toFixed(2)}
         </label>
