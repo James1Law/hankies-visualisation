@@ -16,6 +16,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
   const containerRef = useRef<HTMLDivElement>(null)
   const [currentZoom] = useState(initialZoom)
   const [mouseSource, setMouseSource] = useState<WaveSourceProps | null>(null)
+  const [wandMode, setWandMode] = useState(false)
+  const sparkleCanvasRef = useRef<HTMLCanvasElement>(null)
+  const [sparklePos, setSparklePos] = useState<{x: number, y: number} | null>(null)
 
   // UI controls state
   const DEFAULT_FREQUENCY = 2.5;
@@ -291,9 +294,13 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         amplitude: amplitude + 0.1,
         phase: 0
       })
+      if (wandMode) {
+        setSparklePos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+      }
     }
     const handlePointerLeave = () => {
       setMouseSource(null)
+      setSparklePos(null)
     }
     // Touch interaction handlers
     const handleTouchStart = (e: TouchEvent) => {
@@ -313,6 +320,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         amplitude: amplitude + 0.1,
         phase: 0
       })
+      if (wandMode) {
+        setSparklePos({ x: touch.clientX - rect.left, y: touch.clientY - rect.top })
+      }
     }
     const handleTouchMove = (e: TouchEvent) => {
       if (!containerRef.current) return
@@ -331,16 +341,52 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         amplitude: amplitude + 0.1,
         phase: 0
       })
+      if (wandMode) {
+        setSparklePos({ x: touch.clientX - rect.left, y: touch.clientY - rect.top })
+      }
     }
     const handleTouchEnd = (e: TouchEvent) => {
       e.preventDefault()
       setMouseSource(null)
+      setSparklePos(null)
     }
     container.addEventListener('pointermove', handlePointerMove)
     container.addEventListener('pointerleave', handlePointerLeave)
     container.addEventListener('touchstart', handleTouchStart, { passive: false })
     container.addEventListener('touchmove', handleTouchMove, { passive: false })
     container.addEventListener('touchend', handleTouchEnd, { passive: false })
+
+    // Sparkle effect
+    useEffect(() => {
+      if (!wandMode || !sparkleCanvasRef.current) return
+      const canvas = sparkleCanvasRef.current
+      const ctx = canvas.getContext('2d')
+      let animationId: number
+      function drawSparkles() {
+        if (!ctx) return
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        if (sparklePos) {
+          for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.2
+            const r = 12 + Math.random() * 8
+            const x = sparklePos.x + Math.cos(angle) * r
+            const y = sparklePos.y + Math.sin(angle) * r
+            ctx.beginPath()
+            ctx.arc(x, y, 2 + Math.random() * 2, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(255, 200, 255, ${0.7 + Math.random() * 0.3})`
+            ctx.shadowColor = '#ff00cc'
+            ctx.shadowBlur = 8
+            ctx.fill()
+          }
+        }
+        animationId = requestAnimationFrame(drawSparkles)
+      }
+      drawSparkles()
+      return () => {
+        cancelAnimationFrame(animationId)
+        ctx && ctx.clearRect(0, 0, canvas.width, canvas.height)
+      }
+    }, [wandMode, sparklePos])
 
     return () => {
       window.removeEventListener('resize', handleResize)
@@ -359,7 +405,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       container.removeEventListener('touchmove', handleTouchMove)
       container.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [currentZoom, mouseSource, frequency, amplitude, numSources, animationSpeed])
+  }, [currentZoom, mouseSource, frequency, amplitude, numSources, animationSpeed, wandMode])
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -373,6 +419,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         alignItems: 'center',
         flexWrap: 'wrap',
       }}>
+        <button onClick={() => setWandMode(w => !w)} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: wandMode ? '#ffe6fa' : '#f7f7f7', cursor: 'pointer', color: wandMode ? '#c800a1' : undefined }}>
+          {wandMode ? '🪄 Magic Wand On' : '🪄 Magic Wand Off'}
+        </button>
         <button onClick={handleReset} style={{ padding: '6px 16px', fontWeight: 600, borderRadius: 4, border: '1px solid #ccc', background: '#f7f7f7', cursor: 'pointer' }}>
           Reset to Defaults
         </button>
@@ -389,7 +438,10 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
           Animation Speed: <input type="range" min={0.0001} max={0.1} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
         </label>
       </div>
-      <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%' }} />
+      <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%', position: 'relative', cursor: wandMode ? 'url("data:image/svg+xml,%3Csvg width=\'32\' height=\'32\' viewBox=\'0 0 32 32\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Crect x=\'13\' y=\'2\' width=\'6\' height=\'20\' rx=\'3\' fill=\'%23c800a1\'/%3E%3Ccircle cx=\'16\' cy=\'4\' r=\'4\' fill=\'%23ffb3f6\'/%3E%3C/svg%3E%22) 0 32, auto' : undefined }}>
+        {/* Sparkle overlay canvas */}
+        {wandMode && <canvas ref={sparkleCanvasRef} width={containerRef.current?.clientWidth || 1} height={containerRef.current?.clientHeight || 1} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 10 }} />}
+      </div>
     </div>
   )
 }
