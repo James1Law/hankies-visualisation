@@ -220,7 +220,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate)
-      time += 0.0013
+      time += 0.0006
 
       mainGroup.children.forEach((child: any) => {
         if (child instanceof THREE.Group) {
