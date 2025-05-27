@@ -21,14 +21,17 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
   const DEFAULT_FREQUENCY = 2.5;
   const DEFAULT_AMPLITUDE = 0.4;
   const DEFAULT_NUM_SOURCES = 5;
+  const DEFAULT_ANIMATION_SPEED = 0.0006;
   const [frequency, setFrequency] = useState(DEFAULT_FREQUENCY)
   const [amplitude, setAmplitude] = useState(DEFAULT_AMPLITUDE)
   const [numSources, setNumSources] = useState(DEFAULT_NUM_SOURCES)
+  const [animationSpeed, setAnimationSpeed] = useState(DEFAULT_ANIMATION_SPEED)
 
   const handleReset = () => {
     setFrequency(DEFAULT_FREQUENCY)
     setAmplitude(DEFAULT_AMPLITUDE)
     setNumSources(DEFAULT_NUM_SOURCES)
+    setAnimationSpeed(DEFAULT_ANIMATION_SPEED)
   }
 
   useEffect(() => {
@@ -220,7 +223,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate)
-      time += 0.0006
+      time += animationSpeed
 
       mainGroup.children.forEach((child: any) => {
         if (child instanceof THREE.Group) {
@@ -356,7 +359,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       container.removeEventListener('touchmove', handleTouchMove)
       container.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [currentZoom, mouseSource, frequency, amplitude, numSources])
+  }, [currentZoom, mouseSource, frequency, amplitude, numSources, animationSpeed])
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -381,6 +384,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         </label>
         <label>
           Sources: <input type="range" min={2} max={12} step={1} value={numSources} onChange={e => setNumSources(Number(e.target.value))} /> {numSources}
+        </label>
+        <label>
+          Animation Speed: <input type="range" min={0.0001} max={0.003} step={0.0001} value={animationSpeed} onChange={e => setAnimationSpeed(Number(e.target.value))} /> {animationSpeed.toFixed(4)}
         </label>
       </div>
       <div ref={containerRef} style={{ width: '100%', flex: 1, height: '100%' }} />
