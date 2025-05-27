@@ -37,6 +37,38 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
     setAnimationSpeed(DEFAULT_ANIMATION_SPEED)
   }
 
+  // Sparkle effect (must be at top level, not inside another hook)
+  useEffect(() => {
+    if (!wandMode || !sparkleCanvasRef.current) return
+    const canvas = sparkleCanvasRef.current
+    const ctx = canvas.getContext('2d')
+    let animationId: number
+    function drawSparkles() {
+      if (!ctx) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      if (sparklePos) {
+        for (let i = 0; i < 12; i++) {
+          const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.2
+          const r = 12 + Math.random() * 8
+          const x = sparklePos.x + Math.cos(angle) * r
+          const y = sparklePos.y + Math.sin(angle) * r
+          ctx.beginPath()
+          ctx.arc(x, y, 2 + Math.random() * 2, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(255, 200, 255, ${0.7 + Math.random() * 0.3})`
+          ctx.shadowColor = '#ff00cc'
+          ctx.shadowBlur = 8
+          ctx.fill()
+        }
+      }
+      animationId = requestAnimationFrame(drawSparkles)
+    }
+    drawSparkles()
+    return () => {
+      cancelAnimationFrame(animationId)
+      ctx && ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
+  }, [wandMode, sparklePos])
+
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -355,38 +387,6 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
     container.addEventListener('touchstart', handleTouchStart, { passive: false })
     container.addEventListener('touchmove', handleTouchMove, { passive: false })
     container.addEventListener('touchend', handleTouchEnd, { passive: false })
-
-    // Sparkle effect
-    useEffect(() => {
-      if (!wandMode || !sparkleCanvasRef.current) return
-      const canvas = sparkleCanvasRef.current
-      const ctx = canvas.getContext('2d')
-      let animationId: number
-      function drawSparkles() {
-        if (!ctx) return
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        if (sparklePos) {
-          for (let i = 0; i < 12; i++) {
-            const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.2
-            const r = 12 + Math.random() * 8
-            const x = sparklePos.x + Math.cos(angle) * r
-            const y = sparklePos.y + Math.sin(angle) * r
-            ctx.beginPath()
-            ctx.arc(x, y, 2 + Math.random() * 2, 0, Math.PI * 2)
-            ctx.fillStyle = `rgba(255, 200, 255, ${0.7 + Math.random() * 0.3})`
-            ctx.shadowColor = '#ff00cc'
-            ctx.shadowBlur = 8
-            ctx.fill()
-          }
-        }
-        animationId = requestAnimationFrame(drawSparkles)
-      }
-      drawSparkles()
-      return () => {
-        cancelAnimationFrame(animationId)
-        ctx && ctx.clearRect(0, 0, canvas.width, canvas.height)
-      }
-    }, [wandMode, sparklePos])
 
     return () => {
       window.removeEventListener('resize', handleResize)
